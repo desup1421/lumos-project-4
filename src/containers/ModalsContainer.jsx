@@ -9,60 +9,35 @@ class ModalsContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // form: {
-      //   name: "",
-      //   class: "",
-      //   year: "",
-      //   nim: "",
-      //   guardian_name: "",
-      //   birthDate: "",
-      //   address: "",
-      //   gender: "male",
-      // },
-
       isLoading: false,
     };
   }
 
-  customAlert = (message) => {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-
-    Toast.fire({
-      icon: "success",
-      title: message,
-    });
-  };
 
   //pending alert
   handleSubmit = (e) => {
     e.preventDefault();
     const formData = this.props.form;
+    this.setState({
+      isLoading: true,
+    });
     apiService
       .postNewStudent(formData)
-      .then((result) => {
-        this.setState({
-          isLoading: true,
-        });
-        this.customAlert(result.data.message);
+      .then((result) => { 
+        this.props.customAlert(result.data.message);
+        this.props.handleCloseModal();
       })
       .catch((error) => {
-        console.error("Error adding student:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `${error.response.data.message}`,
+        });
       })
       .finally(() => {
         this.setState({
           isLoading: false,
         });
-        this.props.handleCloseModal();
         this.props.getStudents();
       });
   };
@@ -76,16 +51,21 @@ class ModalsContainer extends Component {
         this.setState({
           isLoading: true,
         });
-        this.customAlert(result.data.message);
+        this.props.customAlert(result.data.message);
+        this.props.handleCloseModal();
       })
       .catch((error) => {
-        console.error("Error adding student:", error);
+        console.log(error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `${error.response.data.message}`,
+        });
       })
       .finally(() => {
         this.setState({
           isLoading: false,
         });
-        this.props.handleCloseModal();
         this.props.getStudents();
       });
   };

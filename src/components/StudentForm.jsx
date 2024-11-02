@@ -38,6 +38,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
           name="name"
           value={form.name}
           onChange={handleChange}
+          required
         />
         <div id="nameFeedback" className="invalid-feedback">
           {formValidation.name.message}
@@ -109,6 +110,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
           name="nim"
           value={form.nim}
           onChange={handleChange} 
+          required
         />
         <div id="nimFeedback" className="invalid-feedback">
           NIM shuld be unique
@@ -127,7 +129,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
           name="guardian_name"
           value={form.guardian_name}
           onChange={handleChange}
-
+          required
         />
         <div id="guardianNameFeedback" className="invalid-feedback">
           Guardian name is required!
@@ -145,6 +147,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
           name="birthDate"
           value={form.birthDate}
           onChange={handleChange}
+          required
         />
         <div id="birthDateFeedback" className="invalid-feedback">
           Birth date is required
@@ -161,6 +164,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
           value={form.address}
           className={`form-control ${formValidation.address.isValid}`}
           onChange={handleChange}
+          required
         ></textarea>
         <div id="addressFeddback" className="invalid-feedback">
           Address is required
@@ -177,6 +181,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
             value="male"
             checked = {form.gender === "male"}
             onChange={handleChange}
+            required
           />
           <label className="form-check-label" htmlFor="male">
             Male
@@ -191,6 +196,7 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
             value="female"
             checked = {form.gender === "female"}
             onChange={handleChange}
+            required
           />
           <label className="form-check-label" htmlFor="female">
             Female
@@ -202,7 +208,6 @@ const StudentForm = ({formValidation, form, handleChange, handleSubmit, isLoadin
         type="submit" 
         className="btn btn-primary"
         disabled={isLoading}
-
       >
         Submit
       </button>

@@ -3,7 +3,6 @@ import StudentsContainer from "./containers/StudentsContainer";
 import ModalsContainer from "./containers/ModalsContainer";
 import apiService from "./utils/api";
 import Swal from "sweetalert2";
-// import ExampleContainer from './containers/ExampleContainer';
 
 class App extends Component {
   // Modal state
@@ -65,6 +64,9 @@ class App extends Component {
         gender: "male",
       },
       currentStudent: {},
+      isSearch: false,
+      searchInput: "",
+      searchResults: [],
     };
   }
 
@@ -160,9 +162,45 @@ class App extends Component {
     }
   };
 
+  resetFormValidation = () => {
+    this.setState({
+      formValidation: {
+        name: {
+          isValid: "",
+          message: "",
+        },
+        class: {
+          isValid: "",
+          message: "Class is required!",
+        },
+        year: {
+          isValid: "",
+          message: "Year is required!",
+        },
+        nim: {
+          isValid: "",
+          message: "NIM is required!",
+        },
+        guardian_name: {
+          isValid: "",
+          message: "Guardian name is required!",
+        },
+        birthDate: {
+          isValid: "",
+          message: "Birth date is required!",
+        },
+        address: {
+          isValid: "",
+          message: "Address is required!",
+        },
+      }
+    })
+  }
+
   // Modal handling functions
   handleCloseModal = () => {
     this.setState({ isShowModal: false });
+    this.resetFormValidation();
   };
   handleShowModal = (e, student = this.state.defaultStudentForm) => {
     e.stopPropagation();
@@ -181,7 +219,6 @@ class App extends Component {
     apiService
       .getStudentList()
       .then((response) => {
-        console.log(response.data);
         this.setState({ students: response.data.data });
       })
       .catch((error) => {
@@ -211,28 +248,70 @@ class App extends Component {
       title: message,
     });
   };
-  
+
+
   handleDelete = (e, student) => {
     e.stopPropagation();
-    const id = student.id;
-    apiService.deleteStudent(id)
-      .then((result) => {
-        this.setState({
-          isLoading: true,
-        });
-        this.customAlert(result.data.message);
-      })
-      .catch((error) => {
-        console.error("Error adding student:", error);
-      })
-      .finally(() => {
-        this.setState({
-          isLoading: false,
-        });
-        this.handleCloseModal();
-        this.getStudents();
-      });
-  }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      customClass: {
+        confirmButton: "btn btn-primary",
+        cancelButton: "btn btn-danger",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const id = student.id;
+        apiService
+          .deleteStudent(id)
+          .then((result) => {
+            this.setState({
+              isLoading: true,
+            });
+            Swal.fire({
+              title: "Deleted!",
+              text: result.data.message,
+              icon: "success",
+              customClass: {
+                confirmButton: "btn btn-primary",
+              },
+            });
+          })
+          .catch((error) => {
+            console.error("Error adding student:", error);
+          })
+          .finally(() => {
+            this.setState({
+              isLoading: false,
+            });
+            this.handleCloseModal();
+            this.getStudents();
+          });
+      }
+    });
+  };
+
+  handleSearch = (e) => {
+    //Change search input to lowercase
+    const searchItem = e.target.value.toLowerCase();
+
+    //use filter to match the search item with student's name or class
+    const filteredStudents = this.state.students.filter(
+      (student) =>
+        student.name.toLowerCase().includes(searchItem) ||
+        student.class.toLowerCase().includes(searchItem)
+    );
+
+    //Set state for search
+    this.setState({
+      isSearch: true,
+      searchInput: e.target.value,
+      searchResults: filteredStudents,
+    });
+  };
 
   render() {
     return (
@@ -241,6 +320,10 @@ class App extends Component {
           handleShowModal={this.handleShowModal}
           students={this.state.students}
           handleDelete={this.handleDelete}
+          handleSearch={this.handleSearch}
+          searchInput={this.state.searchInput}
+          isSearch={this.state.isSearch}
+          searchResults={this.state.searchResults}
         />
         <ModalsContainer
           handleCloseModal={this.handleCloseModal}
@@ -252,6 +335,7 @@ class App extends Component {
           formValidation={this.state.formValidation}
           currentStudent={this.state.currentStudent}
           getStudents={this.getStudents}
+          customAlert={this.customAlert}
         />
       </div>
     );
